@@ -39,7 +39,9 @@ function asset_path($file_path)
         $root_path = Container::get('app')->getRootPath();
         // 资源文件全路径
         $full_path = $root_path.'public/'.$file_path;
+        // SplFileInfo用来获取文件详细信息
         $info = new \SplFileInfo($full_path);
+        //获取inode修改时间
         $file_time = $info->getCTime();
     }catch(\Exception $e){
         $file_time = time();

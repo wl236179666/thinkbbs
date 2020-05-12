@@ -4,6 +4,7 @@ namespace app\index\controller;
 
 use think\Request;
 use app\common\model\User;
+use app\common\exception\ValidateException;
 
 class Register extends Base
 {
@@ -35,13 +36,16 @@ class Register extends Base
      */
     public function save(Request $request,User $user)
     {
-        if(!$request -> isPost() || $request -> isAjax()){
+        if(!$request -> isPost() || !$request -> isAjax()){
             return $this -> error('对不起，你访问页面不存在。');
         }
 
         try{
             //保存表单提交数据
-            $user -> save($request -> post());
+            $param = $request -> post();
+            $user = User::register($param);
+        }catch(ValidateException $e){
+            return $this -> error($e -> getMessage(),null,['error' => $e -> getData()]);
         }catch(\Exception $e){
             return $this -> error('对不起，注册失败。');
         }

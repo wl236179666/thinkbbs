@@ -9,8 +9,4 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-Route::rule('/nnn', function () {
-    echo  'hello,ThinkPHP5!';
-});
-
 Route::get('/','index/index') -> name('page.root');

@@ -5,8 +5,9 @@ namespace app\index\controller;
 use think\Controller;
 use app\common\model\Config as ConfigModel;
 use think\facade\Session;
+use app\common\model\User as UserModel;
 
-abstract class Base extends Controller
+class Base extends Controller
 {
     protected function initialize()
     {
@@ -25,5 +26,8 @@ abstract class Base extends Controller
             }
             $this->assign('flash', $flash);
         }
+        //当前登录用户
+        $current_user = UserModel::currentUser();
+        $this -> assign('current_user',$current_user);
     }
 }

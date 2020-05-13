@@ -4,6 +4,7 @@ namespace app\index\controller;
 use app\common\model\Sms;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
+
 class Index extends Base
 {
     public function index()
@@ -19,7 +20,7 @@ class Index extends Base
         $message = '短信发送成功';
         try {
             $sms = new Sms();
-            $sms->sendCode($mobile);
+            $sms->sendCode($mobile,'lexin');
         } catch (NoGatewayAvailableException $e) {
             $status = false;
             $message = $e->getMessage();

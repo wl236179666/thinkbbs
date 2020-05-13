@@ -5,6 +5,8 @@ namespace app\index\controller;
 use think\Request;
 use app\common\model\User;
 use app\common\exception\ValidateException;
+use app\common\model\Sms;
+use think\facade\Session;
 
 class Register extends Base
 {
@@ -37,7 +39,10 @@ class Register extends Base
     public function save(Request $request,User $user)
     {
         if(!$request -> isPost() || !$request -> isAjax()){
-            return $this -> error('对不起，你访问页面不存在。');
+            $message = '对不起，你访问页面不存在。';
+            // 在跳转前把错误提示消息写入 session 里
+            Session::flash('danger',$message);
+            return $this -> error($message);
         }
 
         try{
@@ -49,9 +54,11 @@ class Register extends Base
         }catch(\Exception $e){
             return $this -> error('对不起，注册失败。');
         }
-
+        $message = '恭喜你注册成功！';
+        // 在调用 success 返回前把注册成功提示消息写入 session 里
+        Session::flash('success', $message);
         //成功后跳转到注册表单页面
-        return $this -> success('恭喜你注册成功！','[page.root]');
+        return $this->success($message, '[page.root]');
     }
 
     /**
@@ -116,5 +123,35 @@ class Register extends Base
     public function delete($id)
     {
         //
+    }
+
+    /**
+     * 发送注册验证码
+     */
+    public function send_code(Request $request)
+    {
+        if(!$request->isAjax()){
+            return $this->redirect('[page.signup]');
+        }else if(!$request->isPost()){
+            return $this->error('对不起，你访问页面不存在。');
+        }
+
+        $mobile = $request->post('mobile');
+        if(empty($mobile)){
+            return $this->error('对不起，注册手机号码不能为空。');
+        }
+        $param = ['name' => 'mobile', 'mobile' => $mobile];
+        if(User::checkFieldUnique($param)){
+            return $this->error('对不起，你填写的手机号码已注册。');
+        }
+
+        try {
+            $sms = new Sms();
+            $sms->sendCode($mobile);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage());
+        }
+
+        return $this->success('验证码发送成功。');
     }
 }

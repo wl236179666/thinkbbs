@@ -2,10 +2,14 @@
 
 namespace app\common\model;
 
+use think\Env;
 use think\facade\Cache;
 use think\facade\Config;
 use Overtrue\EasySms\EasySms;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
+use think\Loader;
+
+require_once '../extend/lx198/SendUtility.php';
 
 class Sms
 {
@@ -26,12 +30,18 @@ class Sms
      * @param    string             $mobile 手机号码
      * @return   Object                     FunctionResult
      */
-    public function sendCode($mobile)
+    public function sendCode($mobile,$type='aliyun')
     {
         $app_env = Config::get('app.env');
         if($app_env == 'production'){
             $code = mt_rand(100000, 999999);
-            $this->sendByAliyun($mobile, $code);
+            if($type == 'aliyun'){
+                $this->sendByaliyun($mobile, $code);
+            }else{
+                $content = '您的验证码是'.$code.'。如非本人操作，请忽略本短信';
+                $this -> sendBylexin($mobile,$content);
+            }
+
         }else{
             $code = 123456;
         }
@@ -49,6 +59,20 @@ class Sms
                     'code' => $code
                 ],
             ]);
+        } catch (NoGatewayAvailableException $exception) {
+            throw new \Exception($exception->getException('aliyun')->getMessage());
+        }
+
+        return $result;
+    }
+
+    // 发送乐信短信
+    public function sendBylexin($mobile,$content)
+    {
+        $config = Config::get('lexinsms.');
+        try {
+            $sms = new \SendUtility($config);
+            $result = $sms->send($mobile,$content);
         } catch (NoGatewayAvailableException $exception) {
             throw new \Exception($exception->getException('aliyun')->getMessage());
         }

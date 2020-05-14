@@ -71,6 +71,7 @@ class User extends Validate
     //场景
     protected $scene = [
         'form_register' => ['name', 'mobile', 'password', 'password_confirmation', 'sms_code'],
+        'seed_register'  =>  ['name', 'mobile', 'password'],
         'reset_password' => ['sms_code', 'password', 'password_confirmation'],
     ];
 }

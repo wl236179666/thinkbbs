@@ -67,4 +67,10 @@ class User extends Validate
         }
         return true;
     }
+
+    //场景
+    protected $scene = [
+        'form_register' => ['name', 'mobile', 'password', 'password_confirmation', 'sms_code'],
+        'reset_password' => ['sms_code', 'password', 'password_confirmation'],
+    ];
 }
